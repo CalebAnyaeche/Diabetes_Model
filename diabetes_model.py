@@ -12,7 +12,55 @@
 #     name: python3
 # ---
 
-# # Training Logistic Regression and Support Vector Machines using Scikit-Learn
+# # Early Stage Diabetes Risk Prediction Model
+
+# Team Members: Caleb Anyaeche and Matthew Zlibut
+
+# #### Background 
+#
+# Diabetes is one of the fastest-growing chronic life-threatening diseases that have already affected 422 million people worldwide according to the report of the World Health Organization (WHO), in 2018. Because of the presence of a generally long asymptomatic stage, early detection of diabetes is constantly wanted for a clinically significant result. Around 50% of all people suffering from diabetes are undiagnosed because of its long-term asymptomatic phase. The early diagnosis of diabetes is only possible by proper assessment of both common and less common sign symptoms, which could be found in different phases from disease initiation up to diagnosis. Data mining classification techniques have been well accepted by researchers for the risk prediction model of the disease.
+
+# #### Goal
+#
+# The objective is to build a machine learning based model to predict if a patient has or will have a early stage diabetes risk.
+
+# #### Reference Paper Result
+#
+# the best result was achieved using Random Forest Algorithm where using tenfold cross-validation 97.4% instances were classified correctly and using percentage split technique, it could classify 99% of the instances correctly.
+
+# ## Dataset Information:
+#
+
+# #### Dependent Attribute
+#
+# Class (1.Positive, 2.Negative)
+
+# #### Independent Attribute
+#
+# Age (20-65)
+# Sex (1.Male, 2.Female)
+# Polyuria (1.Yes, 2.No)
+# Polydipsia (1.Yes, 2.No)
+# Sudden Weight Loss (1.Yes, 2.No)
+# Weakness (1.Yes, 2.No)
+# Polyphagia (1.Yes, 2.No)
+# Genital Thrush (1.Yes, 2.No)
+# Visual Blurring (1.Yes, 2.No)
+# Itching (1.Yes, 2.No)
+# Irritability (1.Yes, 2.No)
+# Delayed Healing (1.Yes, 2.No)
+# Partial Paresis (1.Yes, 2.No)
+# Muscle Stiffness (1.Yes, 2.No)
+# Alopecia (1.Yes, 2.No)
+# Obesity (1.Yes, 2.No)
+
+# #### Missing Data
+#
+# The dataset has no missing data.
+
+# #### Dropped Columns 
+#
+# No column needs to be dropped, as neither of them are keys nor can be derived from others.
 
 import numpy as np
 import pandas as pd
