@@ -163,4 +163,30 @@ print("Coef: ", lr.coef_)
 print("Intercept: ", lr.intercept_)
 print("n_iter: ", lr.n_iter_)
 
+# ## Training Support Vector Machines with scikit-learn
+
+from sklearn.svm import SVC
+svc = SVC(C=10, probability=True, kernel='linear')
+svc.fit(X_train_std, y_train)
+
+# ## Check the performance of the model
+
+# +
+# Calculate the score of training data
+
+score_train = svc.score(X_train_std, y_train)
+print("Training score = ",score_train)
+
+score_test = svc.score(X_test_std, y_test)
+print("Test score = ", score_test)
+# -
+
+print(svc.predict(X_train_std[::10, :]))
+print(svc.predict_proba(X_train_std[::10, :]))
+print(y_train[::10])
+
+# ## Parameters of the model
+
+print("n_support: ", svc.n_support_)
+
 
