@@ -65,6 +65,9 @@
 import numpy as np
 import pandas as pd
 from sklearn import datasets
+from sklearn.model_selection import GridSearchCV
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import recall_score, f1_score, accuracy_score, precision_score, confusion_matrix
 
 # ## Load Dataset
 #
@@ -137,56 +140,140 @@ print(X_train_std[::10, :])
 
 # ## Training a logistic regression with scikit-learn
 
+# +
 from sklearn.linear_model import LogisticRegression
-lr = LogisticRegression(C=0.2)
-lr.fit(X_train_std, y_train)
+
+#setting up the hyperparameter grid
+param_grid = [{'C': np.logspace(-4, 2, 7)}]
+lr = LogisticRegression()
+#using gridsearch cross validation in order to find the best hyperparameters
+gs = GridSearchCV(estimator=lr, 
+    param_grid=param_grid, 
+    scoring='accuracy', 
+    cv=10,
+    n_jobs=-1)
+gs.fit(X_train_std, y_train)
+print(gs.best_estimator_)
+print(gs.best_params_)
+# -
 
 # ## Check the performance of the model
 
 # +
-# Calculate the score of training data
+# Calculate the score of training and testing data
+print('Accuracy training: ', gs.best_score_)
+y_pred_train = gs.best_estimator_.predict(X_train_std)
+y_pred_test = gs.best_estimator_.predict(X_test_std)
+print('Accuracy test: ', accuracy_score(y_test, y_pred_test))
 
-score_train = lr.score(X_train_std, y_train)
-print("Training score = ",score_train)
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('Recall: ', recall_score(y_train, y_pred_train))
+print('F1: ', f1_score(y_train, y_pred_train))
 
-score_test = lr.score(X_test_std, y_test)
-print("Test score = ", score_test)
+#the confusion matrix for training and testing data
+print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
+print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
 # -
 
-print(lr.predict(X_train_std[::10, :]))
-print(lr.predict_proba(X_train_std[::10, :]))
+print(gs.best_estimator_.predict(X_train_std[::10, :]))
+print(gs.best_estimator_.predict_proba(X_train_std[::10, :]))
 print(y_train[::10])
 
-# ## Parameters of the model
+# ### Parameters of the model
 
-print("Coef: ", lr.coef_)
-print("Intercept: ", lr.intercept_)
-print("n_iter: ", lr.n_iter_)
+print("Coef: ", gs.best_estimator_.coef_)
+print("Intercept: ", gs.best_estimator_.intercept_)
+print("n_iter: ", gs.best_estimator_.n_iter_)
 
 # ## Training Support Vector Machines with scikit-learn
 
+# +
 from sklearn.svm import SVC
-svc = SVC(C=10, probability=True, kernel='linear')
-svc.fit(X_train_std, y_train)
+
+#setting the range for c and gamma
+C_range = np.logspace(-4, 2, 7)
+gamma_range = np.logspace(-4, 2, 7)
+
+#setting up the parameters with their respective kernels
+param_grid = [{'C': C_range, 'kernel': ['linear']},
+    {'C': C_range, 
+    'gamma': gamma_range, 
+    'kernel': ['rbf']}]
+
+svc = SVC()
+#setting up the gridsearch cross validation
+gs = GridSearchCV(estimator=svc, 
+    param_grid=param_grid, 
+    scoring='accuracy', 
+    cv=10,
+    n_jobs=-1)
+
+gs.fit(X_train_std, y_train)
+print(gs.best_estimator_)
+print(gs.best_params_)
+# -
 
 # ## Check the performance of the model
 
 # +
-# Calculate the score of training data
+# Calculate the scores of training and testing data
+print('Accuracy: ', gs.best_score_)
 
-score_train = svc.score(X_train_std, y_train)
-print("Training score = ",score_train)
+y_pred_train = gs.best_estimator_.predict(X_train_std)
+y_pred_test = gs.best_estimator_.predict(X_test_std)
+print('Accuracy test: ', accuracy_score(y_test, y_pred_test))
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('recall: ', recall_score(y_train, y_pred_train))
+print('f1: ', f1_score(y_train, y_pred_train))
 
-score_test = svc.score(X_test_std, y_test)
-print("Test score = ", score_test)
+#confusion matrix for training and testing
+print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
+print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
 # -
 
-print(svc.predict(X_train_std[::10, :]))
-print(svc.predict_proba(X_train_std[::10, :]))
+print(gs.best_estimator_.predict(X_train_std[::10, :]))
+# print(gs.best_estimator_.predict_proba(X_train_std[::10, :]))
 print(y_train[::10])
 
-# ## Parameters of the model
+# ### Parameters of the model
 
-print("n_support: ", svc.n_support_)
+print("n_support: ", gs.best_estimator_.n_support_)
+
+# ## Training Multi-Layer Perceptron Classifier with scikit-learn
+
+# +
+#making the hidden layer range that is used
+hls_range = [(m,n) for m in range(8,3,-2) for n in range(m,3,-2)]+[(n,) for n in range(8,3,-1)]
+print(hls_range)
+#making a range of alpha values for the model
+alpha_range = np.logspace(-2,2,5)
+print(alpha_range)
+#creating the parameter grid
+param_grid = [{'alpha':alpha_range, 'hidden_layer_sizes':hls_range}]
+
+#setting up the model
+gs = GridSearchCV(estimator=MLPClassifier(tol=1e-5, 
+                                          learning_rate_init=0.02,
+                                          max_iter=1000,
+                                         random_state=1), 
+                  param_grid=param_grid, 
+                  cv=5)
+
+gs.fit(X_train_std, y_train)
+print(gs.best_estimator_)
+print(gs.best_params_)
+
+# +
+#Retrain the data with the best estimater
+y_pred_train = gs.best_estimator_.predict(X_train_std)
+y_pred_test = gs.best_estimator_.predict(X_test_std)
+
+gs.best_estimator_.fit(X_train_std, y_train)
+print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
+print("The accuracy for the test data is :",gs.best_estimator_.score(X_test_std,y_test))
+#confusion matricies
+print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
+print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
+# -
 
 
