@@ -313,7 +313,7 @@ print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
 # ## Random Forest Classifier
 
 # +
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 
 param_gird={
     'max_depth': [8, 9, 10],
@@ -518,5 +518,21 @@ mv_clf.fit(X_train,y_train)
 
 y_pred = mv_clf.predict(X_test)
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred))
+
+# # Ensemble with Majority Voting classifier
+
+# +
+clf1 = LogisticRegression(C=0.1)
+clf2 = SVC(C=10.0, gamma=0.1)
+clf3 = MLPClassifier(alpha=0.01, hidden_layer_sizes=(8, 4), learning_rate_init=0.02, max_iter=1000, random_state=1,tol=1e-05)
+clf4 = DecisionTreeClassifier(max_depth=5, random_state=0)
+clf5 = RandomForestClassifier(max_depth=6, random_state=1)
+
+eclf1 = VotingClassifier(estimators=[('lr', clf1), ('svc', clf2), ('mlp', clf3), ('dt', clf4), ('rf', clf5)], voting='hard')
+eclf1 = eclf1.fit(X_train, y_train)
+print("The accuracy for the training data is :", eclf1.score(X_train, y_train))
+print("The accuracy for the test data is :", eclf1.score(X_test, y_test))
+
+# -
 
 
