@@ -278,6 +278,10 @@ gs.best_estimator_.fit(X_train_std, y_train)
 print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
 mlp_acc = gs.best_estimator_.score(X_test_std,y_test)
 print("The accuracy for the test data is :", mlp_acc)
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('recall: ', recall_score(y_train, y_pred_train))
+print('f1: ', f1_score(y_train, y_pred_train))
+
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
@@ -309,6 +313,10 @@ gs.best_estimator_.fit(X_train_std, y_train)
 print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
 dt_acc = gs.best_estimator_.score(X_test_std,y_test)
 print("The accuracy for the test data is :", dt_acc)
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('recall: ', recall_score(y_train, y_pred_train))
+print('f1: ', f1_score(y_train, y_pred_train))
+
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
@@ -342,187 +350,14 @@ gs.best_estimator_.fit(X_train_std, y_train)
 print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
 rf_acc = gs.best_estimator_.score(X_test_std,y_test)
 print("The accuracy for the test data is :", rf_acc)
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('recall: ', recall_score(y_train, y_pred_train))
+print('f1: ', f1_score(y_train, y_pred_train))
+
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
 # -
-
-# # Majority Vote
-
-# +
-from sklearn.base import BaseEstimator
-from sklearn.base import ClassifierMixin
-from sklearn.preprocessing import LabelEncoder
-# from sklearn.externals import six
-import six
-from sklearn.base import clone
-from sklearn.pipeline import _name_estimators
-import numpy as np
-import operator
-
-
-class MajorityVoteClassifier(BaseEstimator, 
-                             ClassifierMixin):
-    """ A majority vote ensemble classifier
-
-    Parameters
-    ----------
-    classifiers : array-like, shape = [n_classifiers]
-      Different classifiers for the ensemble
-
-    vote : str, {'classlabel', 'probability'} (default='label')
-      If 'classlabel' the prediction is based on the argmax of
-        class labels. Else if 'probability', the argmax of
-        the sum of probabilities is used to predict the class label
-        (recommended for calibrated classifiers).
-
-    weights : array-like, shape = [n_classifiers], optional (default=None)
-      If a list of `int` or `float` values are provided, the classifiers
-      are weighted by importance; Uses uniform weights if `weights=None`.
-
-    """
-    def __init__(self, classifiers, vote='classlabel', weights=None):
-
-        self.classifiers = classifiers
-        self.named_classifiers = {key: value for key, value
-                                  in _name_estimators(classifiers)}
-        self.vote = vote
-        self.weights = weights
-
-    def fit(self, X, y):
-        """ Fit classifiers.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Matrix of training samples.
-
-        y : array-like, shape = [n_samples]
-            Vector of target class labels.
-
-        Returns
-        -------
-        self : object
-
-        """
-        if self.vote not in ('probability', 'classlabel'):
-            raise ValueError("vote must be 'probability' or 'classlabel'"
-                             "; got (vote=%r)"
-                             % self.vote)
-
-        if self.weights and len(self.weights) != len(self.classifiers):
-            raise ValueError('Number of classifiers and weights must be equal'
-                             '; got %d weights, %d classifiers'
-                             % (len(self.weights), len(self.classifiers)))
-
-        # Use LabelEncoder to ensure class labels start with 0, which
-        # is important for np.argmax call in self.predict
-        self.lablenc_ = LabelEncoder()
-        self.lablenc_.fit(y)
-        self.classes_ = self.lablenc_.classes_
-        self.classifiers_ = []
-        for clf in self.classifiers:
-            fitted_clf = clone(clf).fit(X, self.lablenc_.transform(y))
-            self.classifiers_.append(fitted_clf)
-        return self
-
-    def predict(self, X):
-        """ Predict class labels for X.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Matrix of training samples.
-
-        Returns
-        ----------
-        maj_vote : array-like, shape = [n_samples]
-            Predicted class labels.
-            
-        """
-        if self.vote == 'probability':
-            maj_vote = np.argmax(self.predict_proba(X), axis=1)
-        else:  # 'classlabel' vote
-
-            #  Collect results from clf.predict calls
-            predictions = np.asarray([clf.predict(X)
-                                      for clf in self.classifiers_]).T
-
-            maj_vote = np.apply_along_axis(
-                                      lambda x:
-                                      np.argmax(np.bincount(x,
-                                                weights=self.weights)),
-                                      axis=1,
-                                      arr=predictions)
-        maj_vote = self.lablenc_.inverse_transform(maj_vote)
-        return maj_vote
-
-    def predict_proba(self, X):
-        """ Predict class probabilities for X.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number of samples and
-            n_features is the number of features.
-
-        Returns
-        ----------
-        avg_proba : array-like, shape = [n_samples, n_classes]
-            Weighted average probability for each class per sample.
-
-        """
-        probas = np.asarray([clf.predict_proba(X)
-                             for clf in self.classifiers_])
-        avg_proba = np.average(probas, axis=0, weights=self.weights)
-        return avg_proba
-
-    def get_params(self, deep=True):
-        """ Get classifier parameter names for GridSearch"""
-        if not deep:
-            return super(MajorityVoteClassifier, self).get_params(deep=False)
-        else:
-            out = self.named_classifiers.copy()
-            for name, step in six.iteritems(self.named_classifiers):
-                for key, value in six.iteritems(step.get_params(deep=True)):
-                    out['%s__%s' % (name, key)] = value
-            return out
-
-
-# -
-
-my_models = [lr, svc, mlp, dt, rfc]
-mv_clf = MajorityVoteClassifier(classifiers=my_models)
-all_models=[lr, svc, mlp, dt, rfc, mv_clf]
-clf_labels = ['Logistic Regression', 'Support Vector Classification', 'Multi-Layer Perceptron', 
-              'Decision Tree', 'Random Forest Classification', 'Majority Vote Classification']
-
-# +
-# le = LabelEncoder()
-
-# y_e = le.fit_transform(y)
-
-X_train, X_test, y_train, y_test =\
-       train_test_split(X, y, 
-                        test_size=0.5, 
-                        random_state=1,
-                        stratify=y)
-
-# +
-# for clf, label in zip(all_models, clf_labels):
-#     scores = cross_val_score(estimator=mv_clf,
-#                              X=X_train,
-#                              y=y_train,
-#                              cv=10,
-#                              scoring='roc_auc')
-#     print("ROC AUC: %0.2f (+/- %0.2f) [%s]"
-#           % (scores.mean(), scores.std(), label))
-    
-mv_clf.fit(X_train,y_train)
-# -
-
-y_pred = mv_clf.predict(X_test)
-print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred))
 
 # # Ensemble with Majority Voting classifier
 
@@ -538,6 +373,10 @@ eclf1 = eclf1.fit(X_train, y_train)
 print("The accuracy for the training data is :", eclf1.score(X_train, y_train))
 el_acc = eclf1.score(X_test, y_test)
 print("The accuracy for the test data is :", el_acc)
+y_pred_train = eclf1.predict(X_train)
+print('Precision: ', precision_score(y_train, y_pred_train))
+print('recall: ', recall_score(y_train, y_pred_train))
+print('f1: ', f1_score(y_train, y_pred_train))
 
 # -
 
@@ -561,9 +400,20 @@ plt.bar(xpos, accuracy, label="Correctly classified instances")
 plt.bar(xpos, incorrect, label="Incorrectly classified instances")
 plt.legend(loc="best")
 ax = plt.gca()
-ax.set_ylim([0,150])
+ax.set_ylim([0,130])
 # -
+models_dict = {'Linear Regression': [91.69, 93.15, 93.88, 93.48, 93.68],
+               'Support Vector Classification': [96.77, 98.63, 99.13, 100, 99.57], 
+               'Multi-Layered Perceptron': [98.66, 99.32, 100, 97.82, 98.9], 
+               'Decision Tree': [98.66, 96.58, 100, 97.83, 98.9], 
+               'Random Forest': [99.2, 98.63, 100, 98.69, 99.34], 
+               'Majority Vote': [98.07, 95.77, 99.36, 97.5, 98.42]}
 
+# +
+models_df = pd.DataFrame.from_dict(models_dict).rename(index={0:'Training Accuracy', 1:'Testing Accuracy', 2:'Precision', 3:'Recall', 4:'F1'})
+
+models_df
+# -
 
 
 
