@@ -166,7 +166,8 @@ lr = gs.best_estimator_
 print('Accuracy training: ', gs.best_score_)
 y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
-print('Accuracy test: ', accuracy_score(y_test, y_pred_test))
+lr_acc = accuracy_score(y_test, y_pred_test)
+print('Accuracy test: ', lr_acc)
 
 print('Precision: ', precision_score(y_train, y_pred_train))
 print('Recall: ', recall_score(y_train, y_pred_train))
@@ -224,7 +225,8 @@ print('Accuracy: ', gs.best_score_)
 
 y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
-print('Accuracy test: ', accuracy_score(y_test, y_pred_test))
+svm_acc = accuracy_score(y_test, y_pred_test)
+print('Accuracy test: ', svm_acc)
 print('Precision: ', precision_score(y_train, y_pred_train))
 print('recall: ', recall_score(y_train, y_pred_train))
 print('f1: ', f1_score(y_train, y_pred_train))
@@ -274,7 +276,8 @@ y_pred_test = gs.best_estimator_.predict(X_test_std)
 
 gs.best_estimator_.fit(X_train_std, y_train)
 print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
-print("The accuracy for the test data is :",gs.best_estimator_.score(X_test_std,y_test))
+mlp_acc = gs.best_estimator_.score(X_test_std,y_test)
+print("The accuracy for the test data is :", mlp_acc)
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
@@ -304,7 +307,8 @@ y_pred_test = gs.best_estimator_.predict(X_test_std)
 
 gs.best_estimator_.fit(X_train_std, y_train)
 print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
-print("The accuracy for the test data is :",gs.best_estimator_.score(X_test_std,y_test))
+dt_acc = gs.best_estimator_.score(X_test_std,y_test)
+print("The accuracy for the test data is :", dt_acc)
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
@@ -336,7 +340,8 @@ y_pred_test = gs.best_estimator_.predict(X_test_std)
 
 gs.best_estimator_.fit(X_train_std, y_train)
 print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
-print("The accuracy for the test data is :",gs.best_estimator_.score(X_test_std,y_test))
+rf_acc = gs.best_estimator_.score(X_test_std,y_test)
+print("The accuracy for the test data is :", rf_acc)
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_test, y_pred_test))
@@ -531,8 +536,34 @@ clf5 = RandomForestClassifier(max_depth=6, random_state=1)
 eclf1 = VotingClassifier(estimators=[('lr', clf1), ('svc', clf2), ('mlp', clf3), ('dt', clf4), ('rf', clf5)], voting='hard')
 eclf1 = eclf1.fit(X_train, y_train)
 print("The accuracy for the training data is :", eclf1.score(X_train, y_train))
-print("The accuracy for the test data is :", eclf1.score(X_test, y_test))
+el_acc = eclf1.score(X_test, y_test)
+print("The accuracy for the test data is :", el_acc)
 
 # -
+
+# # Result Summary
+# Accuracy yield from different models. The best result was achieved using Random Forest Algorithm with an accuracy of 98%. 
+
+# +
+import matplotlib.pyplot as plt
+# %matplotlib inline
+
+models = ["LR", "SVM", "MLP", "DT", "RF", "EL"]
+accuracy = [a*100 for a in [lr_acc, svm_acc, mlp_acc, dt_acc, rf_acc, el_acc]]
+incorrect = [100-a for a in accuracy]
+xpos = np.arange(len(models))
+
+plt.xticks(xpos, models)
+plt.xlabel("Models")
+plt.ylabel("Accuracy (%)")
+plt.title("Performance of Classification Algorithms")
+plt.bar(xpos, accuracy, label="Correctly classified instances")
+plt.bar(xpos, incorrect, label="Incorrectly classified instances")
+plt.legend(loc="best")
+ax = plt.gca()
+ax.set_ylim([0,150])
+# -
+
+
 
 
