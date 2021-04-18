@@ -163,15 +163,18 @@ lr = gs.best_estimator_
 
 # +
 # Calculate the score of training and testing data
-print('Accuracy training: ', gs.best_score_)
+lr_t_acc = gs.best_score_
+print('Accuracy training: ', lr_t_acc)
 y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
 lr_acc = accuracy_score(y_test, y_pred_test)
+lr_prec = precision_score(y_train, y_pred_train)
+lr_recall = recall_score(y_train, y_pred_train)
+lr_f1 = f1_score(y_train, y_pred_train)
 print('Accuracy test: ', lr_acc)
-
-print('Precision: ', precision_score(y_train, y_pred_train))
-print('Recall: ', recall_score(y_train, y_pred_train))
-print('F1: ', f1_score(y_train, y_pred_train))
+print('Precision: ', lr_prec)
+print('Recall: ', lr_recall)
+print('F1: ', lr_f1)
 
 #the confusion matrix for training and testing data
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
@@ -221,15 +224,21 @@ svc = gs.best_estimator_
 
 # +
 # Calculate the scores of training and testing data
-print('Accuracy: ', gs.best_score_)
+svm_t_acc = gs.best_score_
+print('Accuracy: ', svm_t_acc)
 
 y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
+
 svm_acc = accuracy_score(y_test, y_pred_test)
+svm_prec = precision_score(y_train, y_pred_train)
+svm_recall = recall_score(y_train, y_pred_train)
+svm_f1 = f1_score(y_train, y_pred_train)
+
 print('Accuracy test: ', svm_acc)
-print('Precision: ', precision_score(y_train, y_pred_train))
-print('recall: ', recall_score(y_train, y_pred_train))
-print('f1: ', f1_score(y_train, y_pred_train))
+print('Precision: ', svm_prec)
+print('recall: ', svm_recall)
+print('f1: ', svm_f1)
 
 #confusion matrix for training and testing
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
@@ -275,12 +284,18 @@ y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
 
 gs.best_estimator_.fit(X_train_std, y_train)
-print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
+
+mlp_t_acc =  gs.best_estimator_.score(X_train_std,y_train)
 mlp_acc = gs.best_estimator_.score(X_test_std,y_test)
+mlp_prec = precision_score(y_train, y_pred_train)
+mlp_recall = recall_score(y_train, y_pred_train)
+mlp_f1 = f1_score(y_train, y_pred_train)
+
+print("The accuracy for the training data is :", mlp_t_acc)
 print("The accuracy for the test data is :", mlp_acc)
-print('Precision: ', precision_score(y_train, y_pred_train))
-print('recall: ', recall_score(y_train, y_pred_train))
-print('f1: ', f1_score(y_train, y_pred_train))
+print('Precision: ', mlp_prec)
+print('recall: ', mlp_recall)
+print('f1: ', mlp_f1)
 
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
@@ -310,12 +325,18 @@ y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
 
 gs.best_estimator_.fit(X_train_std, y_train)
-print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
+
+dt_t_acc = gs.best_estimator_.score(X_train_std,y_train)
 dt_acc = gs.best_estimator_.score(X_test_std,y_test)
+dt_prec = precision_score(y_train, y_pred_train)
+dt_recall = recall_score(y_train, y_pred_train)
+dt_f1 = f1_score(y_train, y_pred_train)
+
+print("The accuracy for the training data is :", dt_t_acc)
 print("The accuracy for the test data is :", dt_acc)
-print('Precision: ', precision_score(y_train, y_pred_train))
-print('recall: ', recall_score(y_train, y_pred_train))
-print('f1: ', f1_score(y_train, y_pred_train))
+print('Precision: ', dt_prec)
+print('recall: ', dt_recall)
+print('f1: ', dt_f1)
 
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
@@ -347,12 +368,18 @@ y_pred_train = gs.best_estimator_.predict(X_train_std)
 y_pred_test = gs.best_estimator_.predict(X_test_std)
 
 gs.best_estimator_.fit(X_train_std, y_train)
-print("The accuracy for the training data is :", gs.best_estimator_.score(X_train_std,y_train))
+
+rf_t_acc = gs.best_estimator_.score(X_train_std,y_train)
 rf_acc = gs.best_estimator_.score(X_test_std,y_test)
+rf_prec = precision_score(y_train, y_pred_train)
+rf_recall = recall_score(y_train, y_pred_train)
+rf_f1 = f1_score(y_train, y_pred_train)
+
+print("The accuracy for the training data is :", rf_t_acc)
 print("The accuracy for the test data is :", rf_acc)
-print('Precision: ', precision_score(y_train, y_pred_train))
-print('recall: ', recall_score(y_train, y_pred_train))
-print('f1: ', f1_score(y_train, y_pred_train))
+print('Precision: ', rf_prec)
+print('recall: ', rf_recall)
+print('f1: ', rf_f1)
 
 #confusion matricies
 print(' TN, FN,\n FP, TP\n', confusion_matrix(y_train, y_pred_train))
@@ -370,13 +397,19 @@ clf5 = RandomForestClassifier(max_depth=6, random_state=1)
 
 eclf1 = VotingClassifier(estimators=[('lr', clf1), ('svc', clf2), ('mlp', clf3), ('dt', clf4), ('rf', clf5)], voting='hard')
 eclf1 = eclf1.fit(X_train, y_train)
-print("The accuracy for the training data is :", eclf1.score(X_train, y_train))
+
+el_t_acc = eclf1.score(X_train, y_train)
 el_acc = eclf1.score(X_test, y_test)
+el_prec = precision_score(y_train, y_pred_train)
+el_recall = recall_score(y_train, y_pred_train)
+el_f1 = f1_score(y_train, y_pred_train)
+
+print("The accuracy for the training data is :", el_t_acc)
 print("The accuracy for the test data is :", el_acc)
 y_pred_train = eclf1.predict(X_train)
-print('Precision: ', precision_score(y_train, y_pred_train))
-print('recall: ', recall_score(y_train, y_pred_train))
-print('f1: ', f1_score(y_train, y_pred_train))
+print('Precision: ', el_prec)
+print('recall: ', el_recall)
+print('f1: ', el_f1)
 
 # -
 
@@ -402,12 +435,12 @@ plt.legend(loc="best")
 ax = plt.gca()
 ax.set_ylim([0,130])
 # -
-models_dict = {'Linear Regression': [91.69, 93.15, 93.88, 93.48, 93.68],
-               'Support Vector Classification': [96.77, 98.63, 99.13, 100, 99.57], 
-               'Multi-Layered Perceptron': [98.66, 99.32, 100, 97.82, 98.9], 
-               'Decision Tree': [98.66, 96.58, 100, 97.83, 98.9], 
-               'Random Forest': [99.2, 98.63, 100, 98.69, 99.34], 
-               'Majority Vote': [98.07, 95.77, 99.36, 97.5, 98.42]}
+models_dict = {'Linear Regression': [lr_t_acc, lr_acc, lr_prec, lr_recall, lr_f1],
+               'Support Vector Classification': [svm_t_acc, svm_acc, svm_prec, svm_recall, svm_f1], 
+               'Multi-Layered Perceptron': [mlp_t_acc, mlp_acc, mlp_prec, mlp_recall, mlp_f1], 
+               'Decision Tree': [dt_t_acc, dt_acc, dt_prec, dt_recall, dt_f1], 
+               'Random Forest': [rf_t_acc, rf_acc, rf_prec, rf_recall, rf_f1], 
+               'Majority Vote': [el_t_acc, el_acc, el_prec, el_recall, el_f1]}
 
 # +
 models_df = pd.DataFrame.from_dict(models_dict).rename(index={0:'Training Accuracy', 1:'Testing Accuracy', 2:'Precision', 3:'Recall', 4:'F1'})
